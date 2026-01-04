@@ -91,7 +91,7 @@ export function KnowledgeCanvas({
       >
         <CanvasCameraController selectedNodeId={selectedNodeId} />
 
-        <Background variant="dots" gap={32} size={1} color="#2a2a2a" />
+        <Background gap={32} size={1} color="#2a2a2a" />
       </ReactFlow>
     </div>
   );
