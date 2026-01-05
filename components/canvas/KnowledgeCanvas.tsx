@@ -9,20 +9,22 @@ import { layoutKnowledgeNodes } from "./layout";
 import { nodeTypes } from "./nodeTypes";
 import { CanvasCameraController } from "./CanvasCameraController";
 import { CanvasControls } from "./CanvasControls";
-import { PresentationStep } from "@/lib/types";
+import { usePresentation } from "@/lib/presentation/usePresentation";
+
+type PresentationController = ReturnType<typeof usePresentation>;
 
 interface KnowledgeCanvasProps {
   searchQuery: string;
   selectedNodeId: string | null;
   onNodeSelect: (id: string | null) => void;
-  presentationStep?: PresentationStep;
+  presentation: PresentationController;
 }
 
 export function KnowledgeCanvas({
   searchQuery,
   selectedNodeId,
   onNodeSelect,
-  presentationStep,
+  presentation,
 }: KnowledgeCanvasProps) {
   const connectedNodeIds = useMemo(() => {
     const ids = new Set<string>();
@@ -50,21 +52,21 @@ export function KnowledgeCanvas({
   }, [allNodes, searchQuery]);
 
   const presentationNodes = useMemo(() => {
-    if (!presentationStep) return visibleNodes;
+    if (!presentation.step) return visibleNodes;
 
-    const focusSet = new Set(presentationStep.focusNodes);
+    const focusSet = new Set(presentation.step.focusNodes);
 
     return visibleNodes.map((node) => ({
       ...node,
       style: focusSet.has(node.id) ? { opacity: 1 } : { opacity: 0.15 },
       selectable: focusSet.has(node.id),
     }));
-  }, [visibleNodes, presentationStep]);
+  }, [visibleNodes, presentation.step]);
 
   const presentationEdges = useMemo(() => {
-    if (!presentationStep) return knowledgeEdges;
+    if (!presentation.step) return knowledgeEdges;
 
-    const focusSet = new Set(presentationStep.focusEdges);
+    const focusSet = new Set(presentation.step.focusEdges);
 
     return knowledgeEdges.map((edge) => ({
       ...edge,
@@ -72,15 +74,10 @@ export function KnowledgeCanvas({
         ? { strokeWidth: 2, opacity: 1 }
         : { opacity: 0.1 },
     }));
-  }, [presentationStep]);
+  }, [presentation.step]);
 
   return (
-    <div
-      className="relative w-full"
-      style={{
-        height: "100dvh",
-      }}
-    >
+    <div className="relative w-full" style={{ height: "100dvh" }}>
       <ReactFlow
         nodes={presentationNodes}
         edges={presentationEdges}
@@ -88,16 +85,18 @@ export function KnowledgeCanvas({
         fitView
         onNodeClick={(_, node) => onNodeSelect(node.id)}
         onPaneClick={() => onNodeSelect(null)}
-        nodesDraggable={!presentationStep}
+        nodesDraggable={!presentation.isActive}
         nodesConnectable={false}
-        elementsSelectable={!presentationStep}
+        elementsSelectable={!presentation.isActive}
       >
         <Background gap={24} size={1} />
+
         <CanvasCameraController
           selectedNodeId={selectedNodeId}
-          presentationStep={presentationStep}
+          presentationStep={presentation.step}
         />
-        <CanvasControls />
+
+        <CanvasControls presentation={presentation} />
       </ReactFlow>
     </div>
   );

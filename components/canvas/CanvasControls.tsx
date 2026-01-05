@@ -3,8 +3,15 @@
 
 import { useReactFlow } from "reactflow";
 import { ControlButton } from "./ControlButton";
+import { usePresentation } from "@/lib/presentation/usePresentation";
 
-export function CanvasControls() {
+type PresentationController = ReturnType<typeof usePresentation>;
+
+type Props = {
+  presentation: PresentationController;
+};
+
+export function CanvasControls({ presentation }: Props) {
   const { zoomIn, zoomOut, fitView } = useReactFlow();
 
   return (
@@ -23,43 +30,77 @@ export function CanvasControls() {
         bottom: "calc(1.5rem + env(safe-area-inset-bottom))",
       }}
     >
-      {/* Zoom Out */}
-      <ControlButton onClick={() => zoomOut()}>
-        <svg width="20" height="20" viewBox="0 0 24 24">
-          <path
-            d="M5 12h14"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-        </svg>
-      </ControlButton>
+      {!presentation.isActive ? (
+        <>
+          {/* Explore controls */}
+          <ControlButton onClick={zoomOut}>−</ControlButton>
 
-      {/* Fit View */}
-      <ControlButton onClick={() => fitView({ padding: 0.4 })}>
-        <svg width="20" height="20" viewBox="0 0 24 24">
-          <path
-            d="M4 4h6v2H6v4H4V4zm10 0h6v6h-2V6h-4V4zm6 10v6h-6v-2h4v-4h2zM4 14h2v4h4v2H4v-6z"
-            stroke="currentColor"
-            strokeWidth="2"
-            fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </ControlButton>
+          <ControlButton onClick={() => fitView({ padding: 0.4 })}>
+            ⤢
+          </ControlButton>
 
-      {/* Zoom In */}
-      <ControlButton onClick={() => zoomIn()}>
-        <svg width="20" height="20" viewBox="0 0 24 24">
-          <path
-            d="M12 5v14M5 12h14"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-        </svg>
-      </ControlButton>
+          <ControlButton onClick={zoomIn}>+</ControlButton>
+
+          {/* Divider */}
+          <div className="w-px h-6 bg-neutral-700 mx-1" />
+
+          {/* Styled Present button */}
+          <button
+            onClick={presentation.start}
+            className="
+              h-10 px-3
+              flex items-center
+              rounded-xl
+              text-sm font-medium
+              text-neutral-100
+              bg-indigo-600/90
+              hover:bg-indigo-500
+              transition-colors
+            "
+          >
+            Present
+          </button>
+        </>
+      ) : (
+        <>
+          {/* Back */}
+          <button
+            onClick={presentation.prev}
+            disabled={!presentation.canPrev}
+            className="
+      px-2 py-1
+      text-sm
+      text-neutral-300
+      hover:text-white
+      disabled:opacity-40
+      disabled:cursor-not-allowed
+      transition-colors
+    "
+          >
+            Back
+          </button>
+
+          {/* Next */}
+          <button
+            onClick={presentation.next}
+            disabled={!presentation.canNext}
+            className="
+      px-2 py-1
+      text-sm
+      text-neutral-300
+      hover:text-white
+      disabled:opacity-40
+      disabled:cursor-not-allowed
+      transition-colors
+    "
+          >
+            Next
+          </button>
+
+          {/* Exit stays strong */}
+          <ControlButton onClick={presentation.exit}>✕</ControlButton>
+        </>
+      )}
     </div>
   );
 }

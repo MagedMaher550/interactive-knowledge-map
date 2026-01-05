@@ -7,19 +7,13 @@ import { NodePanel } from "@/components/panel/NodePanel";
 import { SearchBar } from "@/components/search/SearchBar";
 import { knowledgeNodes } from "@/data/knowledge";
 import { frontendWorkflowPresentation } from "@/data/presentations/frontend-workflow";
-import { PresentationControls } from "@/components/presentations/PresentationControls";
+import { usePresentation } from "@/lib/presentation/usePresentation";
 
 export default function Home() {
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [presentationIndex, setPresentationIndex] = useState<number | null>(
-    null
-  );
 
-  const activeStep =
-    presentationIndex !== null
-      ? frontendWorkflowPresentation.steps[presentationIndex]
-      : undefined;
+  const presentation = usePresentation(frontendWorkflowPresentation.steps);
 
   const searchResults = useMemo(() => {
     if (!searchQuery) return [];
@@ -46,17 +40,10 @@ export default function Home() {
         searchQuery={searchQuery}
         selectedNodeId={selectedNodeId}
         onNodeSelect={setSelectedNodeId}
-        presentationStep={
-          activeStep
-            ? {
-                focusNodes: activeStep.focusNodes,
-                focusEdges: activeStep.focusEdges,
-              }
-            : undefined
-        }
+        presentation={presentation}
       />
 
-      {presentationIndex !== null && (
+      {/* {presentationIndex !== null && (
         <PresentationControls
           onNext={() =>
             setPresentationIndex((i) =>
@@ -88,7 +75,7 @@ export default function Home() {
         >
           Start Presentation
         </button>
-      )}
+      )} */}
 
       <SearchBar
         query={searchQuery}
