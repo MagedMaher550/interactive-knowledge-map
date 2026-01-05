@@ -1,11 +1,6 @@
 import { Handle, Position, NodeProps } from "reactflow";
 import { categoryStyles } from "@/style/theme";
-import { KnowledgeCategory } from "@/lib/types";
-
-type NodeData = {
-  label: string;
-  category: KnowledgeCategory;
-};
+import { KnowledgeCategory, NodeData } from "@/lib/types";
 
 export function KnowledgeNode({ data, selected }: NodeProps<NodeData>) {
   const styles = categoryStyles[data.category];
@@ -26,16 +21,21 @@ export function KnowledgeNode({ data, selected }: NodeProps<NodeData>) {
         {data.label}
       </div>
 
-      <Handle
-        type="target"
-        position={Position.Top}
-        className="!bg-neutral-500/60 !w-2 !h-2 !border-none"
-      />
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        className="!bg-neutral-500/60 !w-2 !h-2 !border-none"
-      />
+      {data.hasIncoming && (
+        <Handle
+          type="target"
+          position={Position.Left}
+          className="!bg-neutral-500/60 !w-2 !h-2 !border-none"
+        />
+      )}
+
+      {data.hasOutgoing && (
+        <Handle
+          type="source"
+          position={Position.Right}
+          className="!bg-neutral-500/60 !w-2 !h-2 !border-none"
+        />
+      )}
     </div>
   );
 }

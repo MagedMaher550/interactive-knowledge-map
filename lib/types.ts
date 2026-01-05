@@ -10,3 +10,13 @@ export interface KnowledgeNode {
     description: string
     category: KnowledgeCategory
 }
+
+
+export type NodeData = {
+    id: string
+    label: string
+    description: string
+    category: KnowledgeCategory
+    hasIncoming: boolean
+    hasOutgoing: boolean
+}

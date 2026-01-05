@@ -33,9 +33,9 @@ export default function Home() {
       }
     >
       <KnowledgeCanvas
-        selectedNodeId={selectedNodeId}
-        onSelectNode={setSelectedNodeId}
         searchQuery={searchQuery}
+        selectedNodeId={selectedNodeId}
+        onNodeSelect={setSelectedNodeId} // ✅ THIS WAS MISSING
       />
 
       <SearchBar
