@@ -23,9 +23,43 @@ export function CanvasControls() {
         bottom: "calc(1.5rem + env(safe-area-inset-bottom))",
       }}
     >
-      <ControlButton onClick={() => zoomOut()} label="−" />
-      <ControlButton onClick={() => fitView({ padding: 0.4 })} label="⤢" />
-      <ControlButton onClick={() => zoomIn()} label="+" />
+      {/* Zoom Out */}
+      <ControlButton onClick={() => zoomOut()}>
+        <svg width="20" height="20" viewBox="0 0 24 24">
+          <path
+            d="M5 12h14"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+        </svg>
+      </ControlButton>
+
+      {/* Fit View */}
+      <ControlButton onClick={() => fitView({ padding: 0.4 })}>
+        <svg width="20" height="20" viewBox="0 0 24 24">
+          <path
+            d="M4 4h6v2H6v4H4V4zm10 0h6v6h-2V6h-4V4zm6 10v6h-6v-2h4v-4h2zM4 14h2v4h4v2H4v-6z"
+            stroke="currentColor"
+            strokeWidth="2"
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </ControlButton>
+
+      {/* Zoom In */}
+      <ControlButton onClick={() => zoomIn()}>
+        <svg width="20" height="20" viewBox="0 0 24 24">
+          <path
+            d="M12 5v14M5 12h14"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+        </svg>
+      </ControlButton>
     </div>
   );
 }

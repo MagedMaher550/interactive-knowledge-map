@@ -3,26 +3,29 @@
 
 export function ControlButton({
   onClick,
-  label,
+  children,
 }: {
   onClick: () => void;
-  label: string;
+  children: React.ReactNode;
 }) {
   return (
     <button
       onClick={onClick}
       className="
-        w-9 h-9
+        w-10 h-10
         flex items-center justify-center
         rounded-xl
-        text-sm font-medium
         text-neutral-200
         bg-neutral-800
         hover:bg-neutral-700
         transition-colors
+        touch-manipulation
       "
+      style={{
+        transform: "translateZ(0)",
+      }}
     >
-      {label}
+      {children}
     </button>
   );
 }
