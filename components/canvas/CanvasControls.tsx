@@ -10,7 +10,7 @@ export function CanvasControls() {
   return (
     <div
       className="
-        absolute bottom-6 left-1/2 -translate-x-1/2
+        absolute left-1/2 -translate-x-1/2
         z-20
         flex items-center gap-2
         rounded-2xl
@@ -19,6 +19,9 @@ export function CanvasControls() {
         px-2 py-2
         shadow-lg
       "
+      style={{
+        bottom: "calc(1.5rem + env(safe-area-inset-bottom))",
+      }}
     >
       <ControlButton onClick={() => zoomOut()} label="−" />
       <ControlButton onClick={() => fitView({ padding: 0.4 })} label="⤢" />
