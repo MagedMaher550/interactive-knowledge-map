@@ -1,33 +1,27 @@
-// src/components/canvas/ControlButton.tsx
 "use client";
 
-import type { ReactNode } from "react";
+import { ReactNode } from "react";
 
-type Props = {
+export function ControlButton({
+  onClick,
+  children,
+}: {
   onClick: () => void;
   children: ReactNode;
-  disabled?: boolean;
-};
-
-export function ControlButton({ onClick, children, disabled = false }: Props) {
+}) {
   return (
     <button
       onClick={onClick}
-      disabled={disabled}
       className="
-        w-10 h-10
+        w-9 h-9
         flex items-center justify-center
         rounded-xl
-        bg-neutral-800 text-neutral-200
-        transition-colors
+        text-neutral-200
+        bg-neutral-800
         hover:bg-neutral-700
-        disabled:opacity-40
-        disabled:cursor-not-allowed
-        active:scale-95
+        transition-colors
+        shrink-0
       "
-      style={{
-        transform: "translateZ(0)",
-      }}
     >
       {children}
     </button>
