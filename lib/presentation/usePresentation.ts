@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { PresentationStep } from "@/lib/types";
 
 export function usePresentation(steps: PresentationStep[]) {
@@ -6,14 +6,41 @@ export function usePresentation(steps: PresentationStep[]) {
 
     const step = index !== null ? steps[index] : undefined;
 
+    const isActive = index !== null;
     const canNext = index !== null && index < steps.length - 1;
     const canPrev = index !== null && index > 0;
 
+    // Keyboard navigation (active only during presentation)
+    useEffect(() => {
+        if (!isActive) return;
+
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "ArrowRight" && canNext) {
+                setIndex((i) => (i !== null ? i + 1 : i));
+            }
+
+            if (e.key === "ArrowLeft" && canPrev) {
+                setIndex((i) => (i !== null ? i - 1 : i));
+            }
+
+            if (e.key === "Escape") {
+                setIndex(null);
+            }
+        };
+
+        window.addEventListener("keydown", onKeyDown);
+        return () => window.removeEventListener("keydown", onKeyDown);
+    }, [isActive, canNext, canPrev]);
+
     return {
         // state
-        isActive: index !== null,
+        isActive,
         index,
         step,
+
+        // derived (for UI)
+        currentStep: index !== null ? index + 1 : null,
+        totalSteps: steps.length,
 
         // capabilities
         canNext,

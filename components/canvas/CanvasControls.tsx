@@ -1,4 +1,3 @@
-// src/components/canvas/CanvasControls.tsx
 "use client";
 
 import { useReactFlow } from "reactflow";
@@ -35,6 +34,7 @@ export function CanvasControls({ presentation }: Props) {
           {/* Explore controls */}
           <ControlButton onClick={zoomOut}>−</ControlButton>
 
+          {/* Fit view (SVG – mobile-safe) */}
           <ControlButton onClick={() => fitView({ padding: 0.4 })}>
             <svg
               width="18"
@@ -58,7 +58,7 @@ export function CanvasControls({ presentation }: Props) {
           {/* Divider */}
           <div className="w-px h-6 bg-neutral-700 mx-1" />
 
-          {/* Styled Present button */}
+          {/* Present */}
           <button
             onClick={presentation.start}
             className="
@@ -82,14 +82,14 @@ export function CanvasControls({ presentation }: Props) {
             onClick={presentation.prev}
             disabled={!presentation.canPrev}
             className="
-      px-2 py-1
-      text-sm
-      text-neutral-300
-      hover:text-white
-      disabled:opacity-40
-      disabled:cursor-not-allowed
-      transition-colors
-    "
+              px-2 py-1
+              text-sm
+              text-neutral-300
+              hover:text-white
+              disabled:opacity-40
+              disabled:cursor-not-allowed
+              transition-colors
+            "
           >
             Back
           </button>
@@ -99,19 +99,32 @@ export function CanvasControls({ presentation }: Props) {
             onClick={presentation.next}
             disabled={!presentation.canNext}
             className="
-      px-2 py-1
-      text-sm
-      text-neutral-300
-      hover:text-white
-      disabled:opacity-40
-      disabled:cursor-not-allowed
-      transition-colors
-    "
+              px-2 py-1
+              text-sm
+              text-neutral-300
+              hover:text-white
+              disabled:opacity-40
+              disabled:cursor-not-allowed
+              transition-colors
+            "
           >
             Next
           </button>
 
-          {/* Exit stays strong */}
+          {/* Step indicator */}
+          <div
+            className="
+              px-2
+              text-xs
+              text-neutral-400
+              select-none
+              tabular-nums
+            "
+          >
+            {presentation.currentStep} / {presentation.totalSteps}
+          </div>
+
+          {/* Exit */}
           <ControlButton
             onClick={() => {
               presentation.exit();
