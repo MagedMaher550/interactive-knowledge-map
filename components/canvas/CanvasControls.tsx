@@ -8,123 +8,90 @@ type PresentationController = ReturnType<typeof usePresentation>;
 
 type Props = {
   presentation: PresentationController;
+  mode: "explore" | "edit";
+  onModeChange: (mode: "explore" | "edit") => void;
 };
 
-export function CanvasControls({ presentation }: Props) {
+export function CanvasControls({ presentation, mode, onModeChange }: Props) {
   const { zoomIn, zoomOut, fitView } = useReactFlow();
 
   return (
     <div
       className="
         absolute left-1/2 -translate-x-1/2
-        z-20
-        flex items-center gap-2
+        z-20 flex items-center gap-2
         rounded-2xl
         bg-neutral-900/90 backdrop-blur
         border border-neutral-800
-        px-2 py-2
-        shadow-lg
+        px-2 py-2 shadow-lg
       "
       style={{
         bottom: "calc(1.5rem + env(safe-area-inset-bottom))",
       }}
     >
-      {!presentation.isActive ? (
+      {/* MODE TOGGLE
+      <button
+        onClick={() => onModeChange(mode === "explore" ? "edit" : "explore")}
+        className={`
+          h-10 px-3 rounded-xl text-sm font-medium border transition-colors
+          ${
+            mode === "edit"
+              ? "bg-amber-600/90 border-amber-500 text-white"
+              : "bg-neutral-800 border-neutral-700 text-neutral-300 hover:text-white"
+          }
+        `}
+      >
+        {mode === "edit" ? "Edit" : "Explore"}
+      </button> */}
+
+      {/* EXPLORE CONTROLS */}
+      {mode === "explore" && !presentation.isActive && (
         <>
-          {/* Explore controls */}
           <ControlButton onClick={zoomOut}>−</ControlButton>
-
-          {/* Fit view (SVG – mobile-safe) */}
           <ControlButton onClick={() => fitView({ padding: 0.4 })}>
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M4 4h6v2H6v4H4V4z" />
-              <path d="M14 4h6v6h-2V6h-4V4z" />
-              <path d="M20 14v6h-6v-2h4v-4h2z" />
-              <path d="M10 20H4v-6h2v4h4v2z" />
-            </svg>
+            ⤢
           </ControlButton>
-
           <ControlButton onClick={zoomIn}>+</ControlButton>
 
-          {/* Divider */}
           <div className="w-px h-6 bg-neutral-700 mx-1" />
 
-          {/* Present */}
           <button
             onClick={presentation.start}
             className="
-              h-10 px-3
-              flex items-center
-              rounded-xl
+              h-10 px-3 rounded-xl
               text-sm font-medium
-              text-neutral-100
-              bg-indigo-600/90
-              hover:bg-indigo-500
-              transition-colors
+              text-white bg-indigo-600/90
+              hover:bg-indigo-500 transition-colors
             "
           >
             Present
           </button>
         </>
-      ) : (
+      )}
+
+      {/* PRESENTATION CONTROLS */}
+      {presentation.isActive && (
         <>
-          {/* Back */}
           <button
             onClick={presentation.prev}
             disabled={!presentation.canPrev}
-            className="
-              px-2 py-1
-              text-sm
-              text-neutral-300
-              hover:text-white
-              disabled:opacity-40
-              disabled:cursor-not-allowed
-              transition-colors
-            "
+            className="px-2 py-1 text-sm text-neutral-300 hover:text-white disabled:opacity-40"
           >
             Back
           </button>
 
-          {/* Next */}
           <button
             onClick={presentation.next}
             disabled={!presentation.canNext}
-            className="
-              px-2 py-1
-              text-sm
-              text-neutral-300
-              hover:text-white
-              disabled:opacity-40
-              disabled:cursor-not-allowed
-              transition-colors
-            "
+            className="px-2 py-1 text-sm text-neutral-300 hover:text-white disabled:opacity-40"
           >
             Next
           </button>
 
-          {/* Step indicator */}
-          <div
-            className="
-              px-2
-              text-xs
-              text-neutral-400
-              select-none
-              tabular-nums
-            "
-          >
+          <div className="px-2 text-xs text-neutral-400 tabular-nums">
             {presentation.currentStep} / {presentation.totalSteps}
           </div>
 
-          {/* Exit */}
           <ControlButton
             onClick={() => {
               presentation.exit();

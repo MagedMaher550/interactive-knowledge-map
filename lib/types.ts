@@ -11,6 +11,13 @@ export interface KnowledgeNode {
     category: KnowledgeCategory
 }
 
+export interface KnowledgeEdge {
+    id: string
+    source: string
+    target: string
+}
+
+
 
 export type NodeData = {
     id: string
@@ -24,4 +31,9 @@ export type NodeData = {
 export type PresentationStep = {
     focusNodes: string[];
     focusEdges: string[];
+};
+
+export type KnowledgeGraph = {
+    nodes: KnowledgeNode[];
+    edges: KnowledgeEdge[];
 };
