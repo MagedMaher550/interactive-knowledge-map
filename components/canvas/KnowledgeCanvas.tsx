@@ -47,17 +47,24 @@ export function KnowledgeCanvas({
   }, [allNodes, searchQuery]);
 
   return (
-    <ReactFlow
-      nodes={visibleNodes}
-      edges={knowledgeEdges}
-      nodeTypes={nodeTypes}
-      fitView
-      onNodeClick={(_, node) => onNodeSelect(node.id)}
-      onPaneClick={() => onNodeSelect(null)}
+    <div
+      className="relative w-full"
+      style={{
+        height: "100dvh",
+      }}
     >
-      <Background gap={24} size={1} />
-      <CanvasCameraController selectedNodeId={selectedNodeId} />
-      <CanvasControls />
-    </ReactFlow>
+      <ReactFlow
+        nodes={visibleNodes}
+        edges={knowledgeEdges}
+        nodeTypes={nodeTypes}
+        fitView
+        onNodeClick={(_, node) => onNodeSelect(node.id)}
+        onPaneClick={() => onNodeSelect(null)}
+      >
+        <Background gap={24} size={1} />
+        <CanvasCameraController selectedNodeId={selectedNodeId} />
+        <CanvasControls />
+      </ReactFlow>
+    </div>
   );
 }
