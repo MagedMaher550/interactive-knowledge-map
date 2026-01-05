@@ -79,7 +79,7 @@ export function KnowledgeCanvas({
   };
 
   return (
-    <div className="w-full h-full bg-neutral-950">
+    <div className="relative w-full h-full bg-neutral-950 dark:bg-neutral-950 bg-neutral-50">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -90,10 +90,63 @@ export function KnowledgeCanvas({
         fitViewOptions={{ padding: 0.4 }}
       >
         <CanvasCameraController selectedNodeId={selectedNodeId} />
-
+        <CanvasControls />
         <Background gap={32} size={1} color="#2a2a2a" />
       </ReactFlow>
     </div>
+  );
+}
+
+/**
+ * Bottom-center custom controls.
+ * Product-grade replacement for React Flow Controls.
+ */
+function CanvasControls() {
+  const { zoomIn, zoomOut, fitView } = useReactFlow();
+
+  return (
+    <div
+      className="
+        absolute bottom-6 left-1/2 -translate-x-1/2
+        z-20
+        flex items-center gap-2
+        rounded-2xl
+        bg-neutral-900/90 backdrop-blur
+        border border-neutral-800
+        px-2 py-2
+        shadow-lg
+      "
+    >
+      <ControlButton onClick={() => zoomOut()} label="−" />
+      <ControlButton onClick={() => fitView({ padding: 0.4 })} label="⤢" />
+      <ControlButton onClick={() => zoomIn()} label="+" />
+    </div>
+  );
+}
+
+function ControlButton({
+  onClick,
+  label,
+}: {
+  onClick: () => void;
+  label: string;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="
+        w-9 h-9
+        flex items-center justify-center
+        rounded-xl
+        text-sm font-medium
+        text-neutral-200
+        bg-neutral-800
+        hover:bg-neutral-700
+        transition-colors
+      "
+    >
+      {label}
+    </button>
   );
 }
 
