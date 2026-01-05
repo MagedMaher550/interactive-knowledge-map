@@ -20,3 +20,8 @@ export type NodeData = {
     hasIncoming: boolean
     hasOutgoing: boolean
 }
+
+export type PresentationStep = {
+    focusNodes: string[];
+    focusEdges: string[];
+};

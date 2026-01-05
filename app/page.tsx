@@ -6,10 +6,20 @@ import { KnowledgeCanvas } from "@/components/canvas/KnowledgeCanvas";
 import { NodePanel } from "@/components/panel/NodePanel";
 import { SearchBar } from "@/components/search/SearchBar";
 import { knowledgeNodes } from "@/data/knowledge";
+import { frontendWorkflowPresentation } from "@/data/presentations/frontend-workflow";
+import { PresentationControls } from "@/components/presentations/PresentationControls";
 
 export default function Home() {
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [presentationIndex, setPresentationIndex] = useState<number | null>(
+    null
+  );
+
+  const activeStep =
+    presentationIndex !== null
+      ? frontendWorkflowPresentation.steps[presentationIndex]
+      : undefined;
 
   const searchResults = useMemo(() => {
     if (!searchQuery) return [];
@@ -35,8 +45,50 @@ export default function Home() {
       <KnowledgeCanvas
         searchQuery={searchQuery}
         selectedNodeId={selectedNodeId}
-        onNodeSelect={setSelectedNodeId} // ✅ THIS WAS MISSING
+        onNodeSelect={setSelectedNodeId}
+        presentationStep={
+          activeStep
+            ? {
+                focusNodes: activeStep.focusNodes,
+                focusEdges: activeStep.focusEdges,
+              }
+            : undefined
+        }
       />
+
+      {presentationIndex !== null && (
+        <PresentationControls
+          onNext={() =>
+            setPresentationIndex((i) =>
+              i !== null
+                ? Math.min(i + 1, frontendWorkflowPresentation.steps.length - 1)
+                : i
+            )
+          }
+          onPrev={() =>
+            setPresentationIndex((i) => (i !== null ? Math.max(i - 1, 0) : i))
+          }
+          onExit={() => setPresentationIndex(null)}
+          canNext={
+            presentationIndex < frontendWorkflowPresentation.steps.length - 1
+          }
+          canPrev={presentationIndex > 0}
+        />
+      )}
+
+      {presentationIndex === null && (
+        <button
+          onClick={() => setPresentationIndex(0)}
+          className="
+      fixed top-4 left-4 z-30
+      px-4 py-2 rounded-xl
+      bg-indigo-600 text-white
+      hover:bg-indigo-500 transition-colors
+    "
+        >
+          Start Presentation
+        </button>
+      )}
 
       <SearchBar
         query={searchQuery}
