@@ -70,7 +70,6 @@ export default function Home() {
         presentation={presentation}
         mode={mode}
         onModeChange={setMode}
-        onGraphChange={setGraph}
       />
 
       <SearchBar
