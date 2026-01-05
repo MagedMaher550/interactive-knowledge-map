@@ -58,9 +58,22 @@ export function CanvasCameraController({
     const centerX = (minX + maxX) / 2;
     const centerY = (minY + maxY) / 2;
 
+    // Viewport size (in graph units)
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    const boundsWidth = maxX - minX;
+    const boundsHeight = maxY - minY;
+
+    // Required zoom to fit bounds
+    const zoomX = viewportWidth / boundsWidth;
+    const zoomY = viewportHeight / boundsHeight;
+
+    const requiredZoom = Math.min(zoomX, zoomY) * 0.8; // padding
+
     requestAnimationFrame(() => {
       setCenter(centerX, centerY, {
-        zoom: 1,
+        zoom: Math.min(1, requiredZoom), // only zoom OUT
         duration: 600,
       });
     });
