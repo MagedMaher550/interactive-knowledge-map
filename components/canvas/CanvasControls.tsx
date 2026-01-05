@@ -112,7 +112,14 @@ export function CanvasControls({ presentation }: Props) {
           </button>
 
           {/* Exit stays strong */}
-          <ControlButton onClick={presentation.exit}>✕</ControlButton>
+          <ControlButton
+            onClick={() => {
+              presentation.exit();
+              fitView({ padding: 0.4 });
+            }}
+          >
+            ✕
+          </ControlButton>
         </>
       )}
     </div>
