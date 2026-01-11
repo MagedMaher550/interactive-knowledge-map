@@ -67,17 +67,17 @@ export default function Home() {
   /* ---------- Node Creation ---------- */
 
   const handleCreateNode = (data: {
-    label: string;
+    title: string;
+    description: string;
     category: KnowledgeCategory;
   }) => {
     if (!createPosition) return;
 
     const newNode: KnowledgeNode = {
       id: crypto.randomUUID(),
-      title: data.label,
-      description: "random for now", 
-      category: data.category, 
-      
+      title: data.title,
+      description: data.description,
+      category: data.category,
     };
 
     setGraph((prev) => ({
@@ -85,7 +85,6 @@ export default function Home() {
       nodes: [...prev.nodes, newNode],
     }));
 
-    // setSelectedNodeId(newNode.id);
     setIsCreateOpen(false);
     setCreatePosition(null);
   };

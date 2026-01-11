@@ -38,8 +38,12 @@ export function KnowledgeCanvas({
   onRequestCreateNode,
 }: KnowledgeCanvasProps) {
   const [isReady, setIsReady] = useState(false);
+
   const hasInitialFit = useRef(false);
   const reactFlowRef = useRef<ReactFlowInstance | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  /* ---------- Layout ---------- */
 
   const connectedNodeIds = useMemo(() => {
     const ids = new Set<string>();
@@ -55,6 +59,8 @@ export function KnowledgeCanvas({
     [nodes, connectedNodeIds]
   );
 
+  /* ---------- Search Filtering ---------- */
+
   const visibleNodes = useMemo(() => {
     if (!searchQuery) return allNodes;
     const q = searchQuery.toLowerCase();
@@ -64,6 +70,8 @@ export function KnowledgeCanvas({
       hidden: !n.data.label.toLowerCase().includes(q),
     }));
   }, [allNodes, searchQuery]);
+
+  /* ---------- Presentation Overlay ---------- */
 
   const presentationNodes = useMemo(() => {
     if (!presentation.step) return visibleNodes;
@@ -90,21 +98,25 @@ export function KnowledgeCanvas({
     }));
   }, [edges, presentation.step]);
 
-  const handleCreateNode = () => {
-    if (!reactFlowRef.current) return;
+  /* ---------- Create Node ---------- */
 
-    const { width, height } = reactFlowRef.current.getViewport();
+  const handleCreateNode = () => {
+    if (!reactFlowRef.current || !containerRef.current) return;
+
+    const bounds = containerRef.current.getBoundingClientRect();
 
     const position = reactFlowRef.current.project({
-      x: width / 2,
-      y: height / 2,
+      x: bounds.width / 2,
+      y: bounds.height / 2,
     });
 
     onRequestCreateNode(position);
   };
 
+  /* ---------- Render ---------- */
+
   return (
-    <div className="relative w-full h-[100dvh]">
+    <div ref={containerRef} className="relative w-full h-[100dvh]">
       {!isReady && (
         <div className="absolute inset-0 z-30 flex items-center justify-center bg-neutral-950">
           <div className="flex flex-col items-center gap-3">
