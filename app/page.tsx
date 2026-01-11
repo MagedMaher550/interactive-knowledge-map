@@ -59,7 +59,7 @@ export default function Home() {
   const searchResults = useMemo(() => {
     if (!searchQuery) return [];
     const q = searchQuery.toLowerCase();
-    return graph.nodes.filter((n) => n.data.label.toLowerCase().includes(q));
+    return graph.nodes.filter((n) => n.title.toLowerCase().includes(q));
   }, [searchQuery, graph.nodes]);
 
   const selectedNode = graph.nodes.find((n) => n.id === selectedNodeId);
