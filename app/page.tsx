@@ -12,7 +12,7 @@ import { knowledgeNodes, knowledgeEdges } from "@/data/knowledge";
 import { frontendWorkflowPresentation } from "@/data/presentations/frontend-workflow";
 import { usePresentation } from "@/lib/presentation/usePresentation";
 
-import type { KnowledgeGraph, KnowledgeNode } from "@/lib/types";
+import type { KnowledgeGraph, KnowledgeNode, KnowledgeEdge } from "@/lib/types";
 import { KnowledgeCategory } from "@/lib/types";
 import { localGraphStorage } from "@/lib/storage/localStorageControl";
 
@@ -64,25 +64,34 @@ export default function Home() {
 
   const selectedNode = graph.nodes.find((n) => n.id === selectedNodeId);
 
-  /* ---------- Node Creation ---------- */
+  /* ---------- Create Node + Edges ---------- */
 
   const handleCreateNode = (data: {
     title: string;
     description: string;
     category: KnowledgeCategory;
+    connectTo: string[];
   }) => {
     if (!createPosition) return;
 
+    const nodeId = crypto.randomUUID();
+
     const newNode: KnowledgeNode = {
-      id: crypto.randomUUID(),
+      id: nodeId,
       title: data.title,
       description: data.description,
       category: data.category,
     };
 
+    const newEdges: KnowledgeEdge[] = data.connectTo.map((targetId) => ({
+      id: crypto.randomUUID(),
+      source: nodeId, // ✅ new node is always the source
+      target: targetId, // ✅ selected existing nodes
+    }));
+
     setGraph((prev) => ({
-      ...prev,
       nodes: [...prev.nodes, newNode],
+      edges: [...prev.edges, ...newEdges],
     }));
 
     setIsCreateOpen(false);
@@ -129,6 +138,10 @@ export default function Home() {
         open={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}
         onCreate={handleCreateNode}
+        existingNodes={graph.nodes.map((n) => ({
+          id: n.id,
+          title: n.title,
+        }))}
       />
     </AppShell>
   );
