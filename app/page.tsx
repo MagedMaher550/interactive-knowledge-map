@@ -10,17 +10,42 @@ import { CreateNodeModal } from "@/components/edit/CreateNodeModal";
 
 import { knowledgeNodes, knowledgeEdges } from "@/data/knowledge";
 import { frontendWorkflowPresentation } from "@/data/presentations/frontend-workflow";
+
 import { usePresentation } from "@/lib/presentation/usePresentation";
 
-import type { KnowledgeGraph, KnowledgeNode, KnowledgeEdge } from "@/lib/types";
+import type {
+  KnowledgeGraph,
+  KnowledgeNode,
+  KnowledgeEdge,
+  Presentation,
+} from "@/lib/types";
 import { KnowledgeCategory } from "@/lib/types";
+
 import { localGraphStorage } from "@/lib/storage/localStorageControl";
+import { localPresentationStorage } from "@/lib/storage/localPresentationStorage";
 
 export default function Home() {
+  /* ---------- Graph ---------- */
+
   const [graph, setGraph] = useState<KnowledgeGraph>({
     nodes: knowledgeNodes,
     edges: knowledgeEdges,
   });
+
+  /* ---------- Presentation ---------- */
+
+  const [presentations, setPresentations] = useState<Presentation[]>([]);
+  const [activePresentationId, setActivePresentationId] = useState<
+    string | null
+  >(null);
+
+  const activePresentation = presentations.find(
+    (p) => p.id === activePresentationId
+  );
+
+  const presentation = usePresentation(activePresentation?.steps ?? []);
+
+  /* ---------- UI State ---------- */
 
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -32,9 +57,7 @@ export default function Home() {
     y: number;
   } | null>(null);
 
-  const presentation = usePresentation(frontendWorkflowPresentation.steps);
-
-  /* ---------- Persistence ---------- */
+  /* ---------- Persistence: Graph ---------- */
 
   useEffect(() => {
     localGraphStorage.load().then((saved) => {
@@ -45,6 +68,27 @@ export default function Home() {
   useEffect(() => {
     localGraphStorage.save(graph);
   }, [graph]);
+
+  /* ---------- Persistence: Presentation ---------- */
+
+  useEffect(() => {
+    localPresentationStorage.load().then((saved) => {
+      if (saved && saved.length > 0) {
+        setPresentations(saved);
+        setActivePresentationId(saved[0].id);
+      } else {
+        // Seed from code once
+        setPresentations([frontendWorkflowPresentation]);
+        setActivePresentationId(frontendWorkflowPresentation.id);
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    if (presentations.length > 0) {
+      localPresentationStorage.save(presentations);
+    }
+  }, [presentations]);
 
   /* ---------- Mode / Presentation Guard ---------- */
 
@@ -85,8 +129,8 @@ export default function Home() {
 
     const newEdges: KnowledgeEdge[] = data.connectTo.map((targetId) => ({
       id: crypto.randomUUID(),
-      source: nodeId, // ✅ new node is always the source
-      target: targetId, // ✅ selected existing nodes
+      source: nodeId,
+      target: targetId,
     }));
 
     setGraph((prev) => ({
@@ -97,6 +141,8 @@ export default function Home() {
     setIsCreateOpen(false);
     setCreatePosition(null);
   };
+
+  /* ---------- Render ---------- */
 
   return (
     <AppShell

@@ -37,3 +37,11 @@ export type KnowledgeGraph = {
     nodes: KnowledgeNode[];
     edges: KnowledgeEdge[];
 };
+
+
+export type Presentation = {
+    id: string;
+    title: string;
+    steps: PresentationStep[];
+};
+
