@@ -1,9 +1,8 @@
 "use client";
 
-import { useMemo } from "react";
-import ReactFlow, { Background } from "reactflow";
+import { useMemo, useRef, useState } from "react";
+import ReactFlow, { Background, type ReactFlowInstance } from "reactflow";
 import "reactflow/dist/style.css";
-import { useRef, useState } from "react";
 
 import { layoutKnowledgeNodes } from "./layout";
 import { nodeTypes } from "./nodeTypes";
@@ -24,6 +23,7 @@ interface KnowledgeCanvasProps {
   presentation: PresentationController;
   mode: "explore" | "edit";
   onModeChange: (mode: "explore" | "edit") => void;
+  onRequestCreateNode: (position: { x: number; y: number }) => void;
 }
 
 export function KnowledgeCanvas({
@@ -35,9 +35,11 @@ export function KnowledgeCanvas({
   presentation,
   mode,
   onModeChange,
+  onRequestCreateNode,
 }: KnowledgeCanvasProps) {
   const [isReady, setIsReady] = useState(false);
   const hasInitialFit = useRef(false);
+  const reactFlowRef = useRef<ReactFlowInstance | null>(null);
 
   const connectedNodeIds = useMemo(() => {
     const ids = new Set<string>();
@@ -88,16 +90,23 @@ export function KnowledgeCanvas({
     }));
   }, [edges, presentation.step]);
 
+  const handleCreateNode = () => {
+    if (!reactFlowRef.current) return;
+
+    const { width, height } = reactFlowRef.current.getViewport();
+
+    const position = reactFlowRef.current.project({
+      x: width / 2,
+      y: height / 2,
+    });
+
+    onRequestCreateNode(position);
+  };
+
   return (
     <div className="relative w-full h-[100dvh]">
       {!isReady && (
-        <div
-          className="
-      absolute inset-0 z-30
-      flex items-center justify-center
-      bg-neutral-950
-    "
-        >
+        <div className="absolute inset-0 z-30 flex items-center justify-center bg-neutral-950">
           <div className="flex flex-col items-center gap-3">
             <div className="w-8 h-8 border-2 border-neutral-700 border-t-white rounded-full animate-spin" />
             <span className="text-sm text-neutral-400">
@@ -106,19 +115,19 @@ export function KnowledgeCanvas({
           </div>
         </div>
       )}
+
       <ReactFlow
         nodes={presentationNodes}
         edges={presentationEdges}
         nodeTypes={nodeTypes}
         onInit={(instance) => {
+          reactFlowRef.current = instance;
+
           if (hasInitialFit.current) return;
           hasInitialFit.current = true;
 
           instance.fitView({ padding: 0.4, duration: 0 });
-          // Allow one paint after fit
-          requestAnimationFrame(() => {
-            setIsReady(true);
-          });
+          requestAnimationFrame(() => setIsReady(true));
         }}
         onNodeClick={(_, node) => onNodeSelect(node.id)}
         onPaneClick={() => onNodeSelect(null)}
@@ -137,6 +146,7 @@ export function KnowledgeCanvas({
           presentation={presentation}
           mode={mode}
           onModeChange={onModeChange}
+          onCreateNode={handleCreateNode}
         />
       </ReactFlow>
     </div>
