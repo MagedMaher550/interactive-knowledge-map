@@ -28,14 +28,20 @@ export type NodeData = {
     hasOutgoing: boolean
 }
 
-export type PresentationStep = {
-    focusNodes: string[];
-    focusEdges: string[];
-};
 
 export type KnowledgeGraph = {
     nodes: KnowledgeNode[];
     edges: KnowledgeEdge[];
+};
+
+
+
+export type PresentationStep = {
+    id: string;
+    title: string;
+    description?: string;
+    focusNodes: string[];
+    focusEdges: string[];
 };
 
 
@@ -44,4 +50,3 @@ export type Presentation = {
     title: string;
     steps: PresentationStep[];
 };
-

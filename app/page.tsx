@@ -7,6 +7,7 @@ import { KnowledgeCanvas } from "@/components/canvas/KnowledgeCanvas";
 import { NodePanel } from "@/components/panel/NodePanel";
 import { SearchBar } from "@/components/search/SearchBar";
 import { CreateNodeModal } from "@/components/edit/CreateNodeModal";
+import { PresentationModal } from "@/components/presentation/PresnetationModal";
 
 import { knowledgeNodes, knowledgeEdges } from "@/data/knowledge";
 import { frontendWorkflowPresentation } from "@/data/presentations/frontend-workflow";
@@ -18,11 +19,11 @@ import type {
   KnowledgeNode,
   KnowledgeEdge,
   Presentation,
+  PresentationStep,
 } from "@/lib/types";
 import { KnowledgeCategory } from "@/lib/types";
 
 import { localGraphStorage } from "@/lib/storage/localStorageControl";
-import { localPresentationStorage } from "@/lib/storage/localPresentationStorage";
 
 export default function Home() {
   /* ---------- Graph ---------- */
@@ -34,18 +35,13 @@ export default function Home() {
 
   /* ---------- Presentation ---------- */
 
-  const [presentations, setPresentations] = useState<Presentation[]>([]);
-  const [activePresentationId, setActivePresentationId] = useState<
-    string | null
-  >(null);
-
-  const activePresentation = presentations.find(
-    (p) => p.id === activePresentationId
+  const [presentation, setPresentation] = useState<Presentation>(
+    frontendWorkflowPresentation
   );
 
-  const presentation = usePresentation(activePresentation?.steps ?? []);
+  const presentationController = usePresentation(presentation.steps);
 
-  /* ---------- UI State ---------- */
+  /* ---------- UI ---------- */
 
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -57,7 +53,9 @@ export default function Home() {
     y: number;
   } | null>(null);
 
-  /* ---------- Persistence: Graph ---------- */
+  const [isPresentationOpen, setIsPresentationOpen] = useState(false);
+
+  /* ---------- Persistence ---------- */
 
   useEffect(() => {
     localGraphStorage.load().then((saved) => {
@@ -69,35 +67,6 @@ export default function Home() {
     localGraphStorage.save(graph);
   }, [graph]);
 
-  /* ---------- Persistence: Presentation ---------- */
-
-  useEffect(() => {
-    localPresentationStorage.load().then((saved) => {
-      if (saved && saved.length > 0) {
-        setPresentations(saved);
-        setActivePresentationId(saved[0].id);
-      } else {
-        // Seed from code once
-        setPresentations([frontendWorkflowPresentation]);
-        setActivePresentationId(frontendWorkflowPresentation.id);
-      }
-    });
-  }, []);
-
-  useEffect(() => {
-    if (presentations.length > 0) {
-      localPresentationStorage.save(presentations);
-    }
-  }, [presentations]);
-
-  /* ---------- Mode / Presentation Guard ---------- */
-
-  useEffect(() => {
-    if (mode === "edit" && presentation.isActive) {
-      presentation.exit();
-    }
-  }, [mode, presentation]);
-
   /* ---------- Search ---------- */
 
   const searchResults = useMemo(() => {
@@ -106,9 +75,9 @@ export default function Home() {
     return graph.nodes.filter((n) => n.title.toLowerCase().includes(q));
   }, [searchQuery, graph.nodes]);
 
-  const selectedNode = graph.nodes.find((n) => n.id === selectedNodeId);
+  const selectedNode = graph.nodes.find((n) => n.id === selectedNodeId) ?? null;
 
-  /* ---------- Create Node + Edges ---------- */
+  /* ---------- Node creation ---------- */
 
   const handleCreateNode = (data: {
     title: string;
@@ -118,19 +87,19 @@ export default function Home() {
   }) => {
     if (!createPosition) return;
 
-    const nodeId = crypto.randomUUID();
+    const id = crypto.randomUUID();
 
     const newNode: KnowledgeNode = {
-      id: nodeId,
+      id,
       title: data.title,
       description: data.description,
       category: data.category,
     };
 
-    const newEdges: KnowledgeEdge[] = data.connectTo.map((targetId) => ({
+    const newEdges: KnowledgeEdge[] = data.connectTo.map((target) => ({
       id: crypto.randomUUID(),
-      source: nodeId,
-      target: targetId,
+      source: id,
+      target,
     }));
 
     setGraph((prev) => ({
@@ -140,6 +109,38 @@ export default function Home() {
 
     setIsCreateOpen(false);
     setCreatePosition(null);
+  };
+
+  /* ---------- Presentation handlers ---------- */
+
+  const handleCreateStep = (step: PresentationStep) => {
+    setPresentation((prev) => ({
+      ...prev,
+      steps: [...prev.steps, step],
+    }));
+  };
+
+  const handleRenameStep = (stepId: string, title: string) => {
+    setPresentation((prev) => ({
+      ...prev,
+      steps: prev.steps.map((s) => (s.id === stepId ? { ...s, title } : s)),
+    }));
+  };
+
+  const handleReorderSteps = (from: number, to: number) => {
+    setPresentation((prev) => {
+      const steps = [...prev.steps];
+      const [moved] = steps.splice(from, 1);
+      steps.splice(to, 0, moved);
+      return { ...prev, steps };
+    });
+  };
+
+  const handleDeleteStep = (stepId: string) => {
+    setPresentation((prev) => ({
+      ...prev,
+      steps: prev.steps.filter((s) => s.id !== stepId),
+    }));
   };
 
   /* ---------- Render ---------- */
@@ -161,13 +162,14 @@ export default function Home() {
         searchQuery={searchQuery}
         selectedNodeId={selectedNodeId}
         onNodeSelect={setSelectedNodeId}
-        presentation={presentation}
+        presentation={presentationController}
         mode={mode}
         onModeChange={setMode}
-        onRequestCreateNode={(position) => {
-          setCreatePosition(position);
+        onRequestCreateNode={(pos) => {
+          setCreatePosition(pos);
           setIsCreateOpen(true);
         }}
+        onOpenPresentation={() => setIsPresentationOpen(true)}
       />
 
       <SearchBar
@@ -188,6 +190,19 @@ export default function Home() {
           id: n.id,
           title: n.title,
         }))}
+      />
+
+      <PresentationModal
+        open={isPresentationOpen}
+        onClose={() => setIsPresentationOpen(false)}
+        presentation={presentation}
+        allNodes={graph.nodes}
+        allEdges={graph.edges}
+        onCreateStep={handleCreateStep}
+        onRenameStep={handleRenameStep}
+        onReorderSteps={handleReorderSteps}
+        onDeleteStep={handleDeleteStep}
+        onStartPresentation={presentationController.start}
       />
     </AppShell>
   );

@@ -3,54 +3,44 @@ export const frontendWorkflowPresentation = {
     title: "Frontend Workflow",
     steps: [
         {
-            id: "intro",
+            id: "component-driven-development",
+            title: "Component-Driven Development",
+            description:
+                "Modern frontend development starts by building isolated, reusable components.",
             focusNodes: ["component-driven-development"],
             focusEdges: [],
-            panel: {
-                title: "Component-Driven Development",
-                content:
-                    "Modern frontend development starts by building isolated, reusable components.",
-            },
         },
         {
             id: "design-systems",
+            title: "Design Systems",
+            description:
+                "Design systems ensure consistency and scalability across teams and products.",
             focusNodes: ["design-systems", "storybook"],
             focusEdges: ["storybook-to-design-systems"],
-            panel: {
-                title: "Design Systems",
-                content:
-                    "Design systems ensure consistency and scale across teams and products.",
-            },
         },
         {
             id: "frameworks",
-            focusNodes: ["react", "nextjs"],
+            title: "Frameworks",
+            description:
+                "React and Next.js form the foundation of many production frontend applications.",
+            focusNodes: ["react", "nextjs", "performance-optimization"],
             focusEdges: ["react-to-nextjs"],
-            panel: {
-                title: "Frameworks",
-                content:
-                    "React and Next.js form the foundation of many production frontend apps.",
-            },
         },
         {
-            id: "quality",
+            id: "quality-standards",
+            title: "Quality & Standards",
+            description:
+                "Linting, formatting, and testing ensure maintainability and reliability.",
             focusNodes: ["eslint", "prettier", "testing-strategy"],
             focusEdges: [],
-            panel: {
-                title: "Quality & Standards",
-                content:
-                    "Tooling and testing ensure maintainability and reliability.",
-            },
         },
         {
-            id: "delivery",
+            id: "delivery-monitoring",
+            title: "Delivery & Monitoring",
+            description:
+                "CI/CD pipelines and monitoring close the feedback loop in production.",
             focusNodes: ["ci-cd", "monitoring"],
             focusEdges: ["ci-cd-to-monitoring"],
-            panel: {
-                title: "Delivery & Monitoring",
-                content:
-                    "CI/CD pipelines and monitoring close the loop in production.",
-            },
         },
     ],
 };

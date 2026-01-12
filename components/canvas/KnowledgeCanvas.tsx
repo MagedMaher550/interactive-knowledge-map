@@ -24,6 +24,7 @@ interface KnowledgeCanvasProps {
   mode: "explore" | "edit";
   onModeChange: (mode: "explore" | "edit") => void;
   onRequestCreateNode: (position: { x: number; y: number }) => void;
+  onOpenPresentation: () => void; // ✅ NEW
 }
 
 export function KnowledgeCanvas({
@@ -36,6 +37,7 @@ export function KnowledgeCanvas({
   mode,
   onModeChange,
   onRequestCreateNode,
+  onOpenPresentation,
 }: KnowledgeCanvasProps) {
   const [isReady, setIsReady] = useState(false);
 
@@ -159,6 +161,7 @@ export function KnowledgeCanvas({
           mode={mode}
           onModeChange={onModeChange}
           onCreateNode={handleCreateNode}
+          onOpenPresentation={onOpenPresentation} // ✅ WIRED
         />
       </ReactFlow>
     </div>

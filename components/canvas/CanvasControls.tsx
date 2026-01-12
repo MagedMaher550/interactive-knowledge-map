@@ -11,6 +11,7 @@ type Props = {
   mode: "explore" | "edit";
   onModeChange: (mode: "explore" | "edit") => void;
   onCreateNode: () => void;
+  onOpenPresentation: () => void; // ✅ NEW
 };
 
 export function CanvasControls({
@@ -18,6 +19,7 @@ export function CanvasControls({
   mode,
   onModeChange,
   onCreateNode,
+  onOpenPresentation,
 }: Props) {
   const { zoomIn, zoomOut, fitView } = useReactFlow();
   const isPresenting = presentation.isActive;
@@ -105,7 +107,7 @@ export function CanvasControls({
 
           <div className="w-px h-6 bg-neutral-700 mx-1" />
 
-          {/* CREATE — visible in explore mode */}
+          {/* CREATE NODE */}
           {mode === "explore" && (
             <ControlButton onClick={onCreateNode}>
               <svg
@@ -115,8 +117,6 @@ export function CanvasControls({
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
               >
                 <line x1="12" y1="5" x2="12" y2="19" />
                 <line x1="5" y1="12" x2="19" y2="12" />
@@ -124,9 +124,7 @@ export function CanvasControls({
             </ControlButton>
           )}
 
-          {/* <div className="w-px h-6 bg-neutral-700 mx-1" /> */}
-
-          {/* EDIT TOGGLE */}
+          {/* EDIT */}
           <button
             onClick={() =>
               onModeChange(mode === "explore" ? "edit" : "explore")
@@ -150,8 +148,6 @@ export function CanvasControls({
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
               >
                 <path d="M12 20h9" />
                 <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
@@ -160,11 +156,9 @@ export function CanvasControls({
             {mode === "edit" ? "Explore" : ""}
           </button>
 
-          {/* PRESENT — explore only */}
+          {/* PRESENT + PRESENTATION */}
           {mode === "explore" && (
             <>
-              <div className="w-px h-6 bg-neutral-700 mx-1 md:block hidden" />
-
               <button
                 onClick={presentation.start}
                 className="
@@ -175,6 +169,18 @@ export function CanvasControls({
                 "
               >
                 Present
+              </button>
+
+              <button
+                onClick={onOpenPresentation}
+                className="
+                  h-9 px-3 rounded-xl
+                  text-sm font-medium
+                  text-neutral-200 bg-neutral-800
+                  hover:bg-neutral-700
+                "
+              >
+                Presentation
               </button>
             </>
           )}
