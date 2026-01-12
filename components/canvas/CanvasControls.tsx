@@ -24,41 +24,48 @@ export function CanvasControls({
   const isPresenting = presentation.isActive;
 
   const [cameraOpen, setCameraOpen] = useState(false);
-  const cameraRef = useRef<HTMLDivElement | null>(null);
+  const cameraGroupRef = useRef<HTMLDivElement | null>(null);
 
-  /* ---------- Outside click to close camera controls ---------- */
+  /* ---------- Outside click (desktop + mobile) ---------- */
   useEffect(() => {
     if (!cameraOpen) return;
 
-    const handler = (e: MouseEvent) => {
-      if (cameraRef.current && !cameraRef.current.contains(e.target as Node)) {
+    const handler = (e: PointerEvent) => {
+      if (
+        cameraGroupRef.current &&
+        !cameraGroupRef.current.contains(e.target as Node)
+      ) {
         setCameraOpen(false);
       }
     };
 
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+    document.addEventListener("pointerdown", handler);
+    return () => document.removeEventListener("pointerdown", handler);
   }, [cameraOpen]);
 
   return (
     <div
-      className="
-        absolute left-1/2 -translate-x-1/2
+      className={`
         z-20
-        flex items-center
-        rounded-2xl
         bg-neutral-900/90 backdrop-blur
         border border-neutral-800
-        px-3 py-2
         shadow-lg
-      "
-      style={{
-        bottom: "calc(1.5rem + env(safe-area-inset-bottom))",
-      }}
+        rounded-2xl
+
+        /* Mobile: centered, constrained width */
+        fixed left-1/2 -translate-x-1/2
+        w-[calc(100%-2rem)] max-w-[420px]
+        bottom-[calc(env(safe-area-inset-bottom)+0.75rem)]
+
+        /* Desktop: floating centered */
+        md:absolute md:left-1/2 md:-translate-x-1/2
+        md:w-auto md:max-w-none
+      `}
+      style={{ touchAction: "manipulation" }}
     >
       {/* ================= PRESENTATION MODE ================= */}
       {isPresenting && (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between gap-2 px-3 py-2">
           <button
             onClick={presentation.prev}
             disabled={!presentation.canPrev}
@@ -67,6 +74,10 @@ export function CanvasControls({
             Back
           </button>
 
+          <div className="text-xs text-neutral-400 tabular-nums">
+            {presentation.currentStep} / {presentation.totalSteps}
+          </div>
+
           <button
             onClick={presentation.next}
             disabled={!presentation.canNext}
@@ -74,10 +85,6 @@ export function CanvasControls({
           >
             Next
           </button>
-
-          <div className="px-2 text-xs text-neutral-400 tabular-nums">
-            {presentation.currentStep} / {presentation.totalSteps}
-          </div>
 
           <ControlButton
             onClick={() => {
@@ -92,10 +99,10 @@ export function CanvasControls({
 
       {/* ================= NORMAL MODE ================= */}
       {!isPresenting && (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 px-3 py-2">
           {/* ================= CAMERA GROUP ================= */}
-          <div ref={cameraRef} className="relative flex items-center">
-            {/* Camera controls */}
+          <div ref={cameraGroupRef} className="relative flex items-center">
+            {/* Expanded camera controls */}
             <div
               className={`
                 absolute
@@ -142,7 +149,7 @@ export function CanvasControls({
               <ControlButton onClick={zoomIn}>+</ControlButton>
             </div>
 
-            {/* Camera button (anchor) */}
+            {/* Camera anchor */}
             <ControlButton onClick={() => setCameraOpen((v) => !v)}>
               <svg
                 width="16"
@@ -197,22 +204,7 @@ export function CanvasControls({
               }
             `}
           >
-            {mode === "explore" && (
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M12 20h9" />
-                <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
-              </svg>
-            )}
-            {mode === "edit" ? "Explore" : ""}
+            {mode === "edit" ? "Explore" : "Edit"}
           </button>
 
           {/* PRESENT */}
