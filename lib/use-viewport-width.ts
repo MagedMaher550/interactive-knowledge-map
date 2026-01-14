@@ -1,17 +1,15 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect } from "react";
 
 export function useViewportWidth() {
-    const [width, setWidth] = useState<number>(window.innerWidth)
+    const [width, setWidth] = useState<number>(0);
 
     useEffect(() => {
-        /**
-         * Handles window resize events and updates width state
-         */
-        const handleResize = () => setWidth(window.innerWidth)
+        const update = () => setWidth(window.innerWidth);
 
-        window.addEventListener("resize", handleResize)
-        return () => window.removeEventListener("resize", handleResize)
-    }, [])
+        update(); // set initial value on client
+        window.addEventListener("resize", update);
+        return () => window.removeEventListener("resize", update);
+    }, []);
 
-    return width
+    return width;
 }
