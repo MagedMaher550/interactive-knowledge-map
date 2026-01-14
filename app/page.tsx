@@ -169,7 +169,7 @@ export default function Home() {
           setCreatePosition(pos);
           setIsCreateOpen(true);
         }}
-        // onOpenPresentation={() => setIsPresentationOpen(true)}
+        onOpenPresentation={() => setIsPresentationOpen(true)}
       />
 
       <SearchBar

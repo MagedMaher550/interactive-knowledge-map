@@ -21,6 +21,7 @@ export function ControlButton({
         hover:bg-neutral-700
         transition-colors
         shrink-0
+        cursor-pointer
       "
     >
       {children}

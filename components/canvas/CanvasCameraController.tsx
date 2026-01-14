@@ -13,7 +13,7 @@ export function CanvasCameraController({
   selectedNodeId,
   presentationStep,
 }: Props) {
-  const { getNodes, setCenter, fitView } = useReactFlow();
+  const { getNodes, setCenter } = useReactFlow();
 
   /**
    * EXPLORE MODE
