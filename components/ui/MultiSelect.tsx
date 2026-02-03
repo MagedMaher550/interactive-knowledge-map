@@ -22,7 +22,9 @@ export function MultiSelect({
 }: Props) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const ref = useRef<HTMLDivElement | null>(null);
+
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
 
   const selected = useMemo(
     () => options.filter((o) => value.includes(o.value)),
@@ -39,10 +41,19 @@ export function MultiSelect({
     [options, value, query]
   );
 
-  // Close on outside click
+  /* ---------- Focus search on open ---------- */
+  useEffect(() => {
+    if (open) {
+      requestAnimationFrame(() => {
+        searchInputRef.current?.focus();
+      });
+    }
+  }, [open]);
+
+  /* ---------- Close on outside click ---------- */
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (!ref.current?.contains(e.target as Node)) {
+      if (!containerRef.current?.contains(e.target as Node)) {
         setOpen(false);
         setQuery("");
       }
@@ -52,7 +63,7 @@ export function MultiSelect({
   }, []);
 
   return (
-    <div ref={ref} className="relative">
+    <div ref={containerRef} className="relative">
       {/* Input */}
       <div
         onClick={() => setOpen((v) => !v)}
@@ -87,7 +98,9 @@ export function MultiSelect({
         ))}
 
         {selected.length === 0 && (
-          <span className="text-sm text-neutral-500 px-1">{placeholder}</span>
+          <span className="text-sm text-neutral-500 px-1">
+            {placeholder}
+          </span>
         )}
 
         <div className="ml-auto px-1 text-neutral-400">▾</div>
@@ -106,6 +119,7 @@ export function MultiSelect({
           {/* Search */}
           <div className="p-2 border-b border-neutral-800">
             <input
+              ref={searchInputRef}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search…"
@@ -126,6 +140,7 @@ export function MultiSelect({
                 onClick={() => {
                   onChange([...value, opt.value]);
                   setQuery("");
+                  setOpen(false);
                 }}
                 className="
                   w-full px-3 py-2 text-left text-sm
