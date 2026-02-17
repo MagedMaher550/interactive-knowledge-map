@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { KnowledgeNode } from "@/lib/types";
 import { EditNodeModal } from "../edit/NodeEditPanel";
 import NodeControls from "./NodeControls";
@@ -30,11 +30,19 @@ export function NodePanel({
 }: NodePanelProps) {
   const [editOpen, setEditOpen] = useState(false);
 
+  // Lock body scroll on mobile
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, []);
+
   return (
     <>
-      <div className="h-full flex flex-col bg-neutral-950">
+      <div className="fixed inset-0 z-40 bg-neutral-950 flex flex-col">
         {/* Header */}
-        <div className="px-6 pt-6 pb-5 border-b border-neutral-800">
+        <div className="px-6 pt-6 pb-5 border-b border-neutral-800 shrink-0">
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-1">
               <h2 className="text-xl font-semibold text-white leading-tight">
@@ -55,9 +63,10 @@ export function NodePanel({
           </div>
         </div>
 
-        {/* Body */}
-        <div className="flex-1 px-6 py-6 space-y-6 overflow-y-auto">
-          <section>
+        {/* Body (NO scroll here) */}
+        <div className="flex-1 px-6 py-6 space-y-6 flex flex-col overflow-hidden">
+          {/* Description */}
+          <section className="shrink-0">
             <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">
               Description
             </h3>
@@ -71,12 +80,13 @@ export function NodePanel({
             </div>
           </section>
 
-          <section>
-            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">
+          {/* Outgoing Connections (ONLY scrollable area) */}
+          <section className="flex flex-col flex-1 min-h-0">
+            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-500 shrink-0">
               Outgoing Connections
             </h3>
 
-            <div className="rounded-lg bg-neutral-900 p-3">
+            <div className="rounded-lg bg-neutral-900 p-3 flex-1 overflow-y-auto">
               {currentOutgoing.length > 0 ? (
                 <ul className="space-y-2 text-sm text-neutral-300">
                   {currentOutgoing.map((id) => {
@@ -101,8 +111,8 @@ export function NodePanel({
           </section>
         </div>
 
-        {/* Actions */}
-        <div className="border-t border-neutral-800 bg-neutral-950 px-6 py-4">
+        {/* Actions (fixed bottom) */}
+        <div className="border-t border-neutral-800 bg-neutral-950 px-6 py-4 shrink-0">
           <NodeControls
             onEdit={() => setEditOpen(true)}
             onDelete={() => onRequestDelete(node.id)}
