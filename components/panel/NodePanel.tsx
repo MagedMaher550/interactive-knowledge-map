@@ -29,18 +29,38 @@ export function NodePanel({
   onRequestDelete,
 }: NodePanelProps) {
   const [editOpen, setEditOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
-  // Lock body scroll on mobile
+  /* ---------- Detect ≤ 425px ---------- */
+
   useEffect(() => {
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = "";
-    };
+    const check = () => setIsMobile(window.innerWidth <= 425);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
   }, []);
+
+  /* ---------- Lock scroll only on mobile ---------- */
+
+  useEffect(() => {
+    if (isMobile) {
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = "";
+      };
+    }
+  }, [isMobile]);
 
   return (
     <>
-      <div className="fixed inset-0 z-40 bg-neutral-950 flex flex-col">
+      <div
+        className={`
+          z-40 bg-neutral-950 flex flex-col
+          ${isMobile
+            ? "fixed inset-0"
+            : "absolute right-0 top-0 h-full w-[420px] border-l border-neutral-800"}
+        `}
+      >
         {/* Header */}
         <div className="px-6 pt-6 pb-5 border-b border-neutral-800 shrink-0">
           <div className="flex items-start justify-between gap-4">
@@ -63,7 +83,7 @@ export function NodePanel({
           </div>
         </div>
 
-        {/* Body (NO scroll here) */}
+        {/* Body */}
         <div className="flex-1 px-6 py-6 space-y-6 flex flex-col overflow-hidden">
           {/* Description */}
           <section className="shrink-0">
@@ -80,7 +100,7 @@ export function NodePanel({
             </div>
           </section>
 
-          {/* Outgoing Connections (ONLY scrollable area) */}
+          {/* Outgoing Connections (only scrollable area) */}
           <section className="flex flex-col flex-1 min-h-0">
             <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-500 shrink-0">
               Outgoing Connections
@@ -111,7 +131,7 @@ export function NodePanel({
           </section>
         </div>
 
-        {/* Actions (fixed bottom) */}
+        {/* Actions */}
         <div className="border-t border-neutral-800 bg-neutral-950 px-6 py-4 shrink-0">
           <NodeControls
             onEdit={() => setEditOpen(true)}

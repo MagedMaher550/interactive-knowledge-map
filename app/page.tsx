@@ -9,6 +9,7 @@ import { SearchBar } from "@/components/search/SearchBar";
 import { CreateNodeModal } from "@/components/edit/CreateNodeModal";
 import { PresentationModal } from "@/components/presentation/PresnetationModal";
 import { ConfirmDeleteDialogue } from "@/components/panel/ConfirmDeleteDialogue";
+import { OnboardingModal } from "@/components/onboarding/onboarding";
 
 import { knowledgeNodes, knowledgeEdges } from "@/data/knowledge";
 import { frontendWorkflowPresentation } from "@/data/presentations/frontend-workflow";
@@ -56,6 +57,22 @@ export default function Home() {
   } | null>(null);
 
   const [isPresentationOpen, setIsPresentationOpen] = useState(false);
+
+  /* ---------- Onboarding ---------- */
+
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  useEffect(() => {
+    const seen = localStorage.getItem("knowledge-map:onboarding-seen");
+    if (!seen) {
+      setShowOnboarding(true);
+    }
+  }, []);
+
+  const closeOnboarding = () => {
+    localStorage.setItem("knowledge-map:onboarding-seen", "true");
+    setShowOnboarding(false);
+  };
 
   /* ---------- Delete state ---------- */
 
@@ -245,6 +262,16 @@ export default function Home() {
           ) : null
         }
       >
+        {/* Help Button */}
+        <div className="fixed top-4 right-4 z-40">
+          <button
+            onClick={() => setShowOnboarding(true)}
+            className="h-9 w-9 rounded-full bg-neutral-800 text-sm text-neutral-300 hover:bg-neutral-700"
+          >
+            ?
+          </button>
+        </div>
+
         <KnowledgeCanvas
           nodes={graph.nodes}
           edges={graph.edges}
@@ -313,8 +340,7 @@ export default function Home() {
         />
       </AppShell>
 
-      {/* ---------- Delete confirmation dialogs ---------- */}
-
+      {/* Delete Dialogues */}
       <ConfirmDeleteDialogue
         open={deleteState.step === "initial"}
         title="Delete node"
@@ -349,6 +375,12 @@ export default function Home() {
             executeDeleteNode(deleteState.nodeId);
           }
         }}
+      />
+
+      {/* Onboarding */}
+      <OnboardingModal
+        open={showOnboarding}
+        onClose={closeOnboarding}
       />
     </>
   );

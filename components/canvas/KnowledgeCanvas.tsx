@@ -117,6 +117,7 @@ export function KnowledgeCanvas({
 
   /* ---------- Render ---------- */
 
+
   return (
     <div ref={containerRef} className="relative w-full h-[100dvh]">
       {!isReady && (
@@ -149,6 +150,13 @@ export function KnowledgeCanvas({
         nodesConnectable={false}
         elementsSelectable
       >
+
+
+        {nodes.length === 0 && <div className="flex h-full items-center justify-center text-neutral-500 text-sm">
+          Click &quot;+&quot; to create your first node.
+        </div>}
+
+
         <Background gap={24} size={1} />
 
         <CanvasCameraController
