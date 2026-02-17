@@ -1,6 +1,6 @@
 export const frontendWorkflowPresentation = {
     id: "default-presentation",
-    title: "Untitled Presentation",
+    title: "Frontend Workflow",
     steps: [],
   };
   
